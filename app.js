@@ -44,12 +44,15 @@ function showNotes() {
   notesObj.forEach((element, index) => {
     title = titlesObj[index];
     html += `
-    <div class="card my-3 mx-3 noteCard" id="noteCard" style="width: 18rem">
+    <div class="card my-3 mx-3 note-card" style="width: 18rem">
     <div class="card-body">
       <h5 class="card-title">${title ? title : `Note: ${index}`}</h5>
       <p class="card-text">${element}</p>
       <button onclick="deleteNotes(this.id)" id=${index} class="btn btn-sm btn-danger">
         Delete
+      </button>
+      <button class="btn btn-light mark-important-btn btn-sm">
+        Mark as Important
       </button>
     </div>
     </div>
@@ -58,6 +61,13 @@ function showNotes() {
   let notesElm = document.getElementById("yourNotes");
   if (notesObj.length != 0) {
     notesElm.innerHTML = html;
+    let noteCards = document.querySelectorAll(".note-card");
+    noteCards.forEach((noteCard) => {
+      noteCard.classList.add("fade-in");
+      setTimeout(() => {
+        noteCard.style.opacity = 1;
+      }, 100);
+    });
   } else {
     notesElm.innerHTML = `No items to display. Please utilize the "Add a Note" section to include some notes.`;
   }
@@ -80,14 +90,21 @@ const deleteNotes = (index) => {
   titlesObj.splice(index, 1);
   localStorage.setItem("titles", JSON.stringify(titlesObj));
   localStorage.setItem("notes", JSON.stringify(notesObj));
-  showNotes();
+
+  const noteCard = document.getElementById(index).closest(".note-card");
+  noteCard.classList.add("fade-out");
+
+  setTimeout(() => {
+    noteCard.remove();
+    showNotes();
+  }, 500);
 };
 
 // Function to search notes
 const search = document.getElementById("searchTxt");
 search.addEventListener("input", () => {
   let inputVal = search.value.toLowerCase();
-  let noteCards = document.getElementsByClassName("noteCard");
+  let noteCards = document.getElementsByClassName("note-card");
   Array.from(noteCards).forEach((element) => {
     let cardTxt = element.getElementsByTagName("p")[0].innerText;
     if (cardTxt.toLowerCase().startsWith(inputVal)) {
@@ -95,6 +112,20 @@ search.addEventListener("input", () => {
     } else {
       element.style.display = "none";
     }
+  });
+});
+
+// MarkImportantButtons
+const markImportantButtons = document.querySelectorAll(".mark-important-btn");
+markImportantButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    const noteCard = event.target.closest(".note-card");
+    noteCard.classList.toggle("important");
+
+    // Store the state of the important note card in local storage
+    const noteId = noteCard.getAttribute("data-note-id");
+    const isImportant = noteCard.classList.contains("important");
+    localStorage.setItem(`note-${noteId}-important`, isImportant);
   });
 });
 
