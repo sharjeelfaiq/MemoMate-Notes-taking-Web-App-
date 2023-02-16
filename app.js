@@ -22,6 +22,7 @@ addBtn.addEventListener("click", () => {
   localStorage.setItem("notes", JSON.stringify(notesObj));
   // Calling showNotes() fucntion defined ahead.
   showNotes();
+  reloadPage();
   addTitle.value = "";
   addTxt.value = "";
 });
@@ -98,6 +99,7 @@ const deleteNotes = (index) => {
     noteCard.remove();
     showNotes();
   }, 500);
+  reloadPage();
 };
 
 // Function to search notes
@@ -115,19 +117,10 @@ search.addEventListener("input", () => {
   });
 });
 
-// MarkImportantButtons
-const markImportantButtons = document.querySelectorAll(".mark-important-btn");
-markImportantButtons.forEach((button) => {
-  button.addEventListener("click", (event) => {
-    const noteCard = event.target.closest(".note-card");
-    noteCard.classList.toggle("important");
-
-    // Store the state of the important note card in local storage
-    const noteId = noteCard.getAttribute("data-note-id");
-    const isImportant = noteCard.classList.contains("important");
-    localStorage.setItem(`note-${noteId}-important`, isImportant);
-  });
-});
+// Reloads the page function
+function reloadPage() {
+  location.reload();
+}
 
 /*
 Further Features:
